@@ -141,16 +141,17 @@ public class Ray {
 		Refraction refraction = new Refraction();
 		
 		float n = n1 / n2;
-		Vector D = direction.normalize().mult(n);
+		
 		
 		float c1 = -normal.dot(direction.normalize());
 		float thetaT = (float) (Math.pow(n, 2) * (1 - Math.pow(c1, 2)));
 		
 		if (thetaT <= 1) {
-			float sqrtPart = (float) (1 - thetaT);
-
-			float c2 = (float) Math.sqrt(sqrtPart);
+			float c2 = (float) Math.sqrt(1 - thetaT);
+			
 			Vector B = normal.mult(n*c1-c2);
+			Vector D = direction.normalize().mult(n);
+			
 			refraction.direction = D.add(B);
 
 			// schlick approximation
