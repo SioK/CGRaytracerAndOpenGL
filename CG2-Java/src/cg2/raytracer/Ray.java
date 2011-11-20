@@ -11,7 +11,7 @@ public class Ray {
 	private Vector origin;
 	private Vector direction;
 	private int recursionDepth;
-	private final float OFFSET = 0.001f;
+	private final float OFFSET = 0.0001f;
 
 	/**
 	 * 
@@ -51,12 +51,12 @@ public class Ray {
 
 		result = result.add(material.computeAmbient(scene.getAmbientLight()));
 
-		Vector normal = firstHit.getNormal();
 		for (LightSource light : scene.getLightSources()) {
-			Vector offset = normal.mult(OFFSET);
-			Ray shadowRay = new Ray(light.getPosition().sub(
-					firstHit.getIntersectionPoint()), firstHit
-					.getIntersectionPoint().add(offset), recursionDepth);
+			Vector direction = light.getPosition().sub(firstHit.getIntersectionPoint()).normalize();
+			Vector offset = direction.mult(OFFSET);
+			
+			Ray shadowRay = new Ray(direction,
+					firstHit.getIntersectionPoint().add(offset), recursionDepth);
 
 			Hit intersection = scene.intersect(shadowRay);
 
@@ -73,12 +73,12 @@ public class Ray {
 			float reflectionAbility = 1;
 
 			if (n1 > 0 && n2 > 0) {
-				Refraction refractionIn = getRefraction(direction, normal, n1, n2);
+				Refraction refractionIn = getRefraction(direction, firstHit.getNormal(), n1, n2);
 				
 				reflectionAbility = refractionIn.reflectionAbility;
 
 				if (refractionIn.direction != null) {
-					Vector offset = normal.mult(OFFSET);
+					Vector offset = refractionIn.direction.mult(OFFSET);
 					Ray refractionRay = new Ray(
 							refractionIn.direction,
 							firstHit.getIntersectionPoint().sub(offset),
@@ -89,7 +89,7 @@ public class Ray {
 					Refraction refractionOut = getRefraction(refractionRay.direction, outHit.getNormal().mult(-1), n2, n1);
 					
 					if (refractionOut.direction != null) {
-						Ray outRay = new Ray(refractionOut.direction, outHit.getIntersectionPoint().add(outHit.getNormal().mult(OFFSET)), recursionDepth-1);
+						Ray outRay = new Ray(refractionOut.direction, outHit.getIntersectionPoint().add(refractionOut.direction.mult(OFFSET)), recursionDepth-1);
 
 						result = result.add(outRay.trace(scene).modulate(refractionIn.transmissionAbility));
 					}
@@ -97,9 +97,10 @@ public class Ray {
 			}
 			
 			if (material.getReflectionCo() > 0) {
-				Vector offset = normal.mult(OFFSET);
+				Vector direction = getReflection(this.direction, firstHit.getNormal());
+				Vector offset = direction.mult(OFFSET);
 				
-				Ray reflectionRay = new Ray(getReflection(direction, normal), 
+				Ray reflectionRay = new Ray(direction, 
 						firstHit.getIntersectionPoint().add(offset), recursionDepth - 1);
 				
 				result = result.add(reflectionRay.trace(scene)
