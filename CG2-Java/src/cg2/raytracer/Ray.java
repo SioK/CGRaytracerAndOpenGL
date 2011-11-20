@@ -11,7 +11,7 @@ public class Ray {
 	private Vector origin;
 	private Vector direction;
 	private int recursionDepth;
-	private final float OFFSET = 0.0001f;
+	private final float OFFSET = 0.0005f;
 
 	/**
 	 * 
@@ -67,17 +67,16 @@ public class Ray {
 		}
 
 		if (recursionDepth > 0) {
-			float n1 = material.getRefractionMediumInside();
-			float n2 = material.getRefractionMediumOutside();
+			float n1 = material.getRefractionMediumOutside();
+			float n2 = material.getRefractionMediumInside();
 			
 			float reflectionAbility = 1;
 
 			if (n1 > 0 && n2 > 0) {
 				Refraction refractionIn = getRefraction(direction, firstHit.getNormal(), n1, n2);
 				
-				reflectionAbility = refractionIn.reflectionAbility;
-
-				if (refractionIn.direction != null) {
+				if (refractionIn != null) {
+					reflectionAbility = refractionIn.reflectionAbility;
 					Vector offset = refractionIn.direction.mult(OFFSET);
 					Ray refractionRay = new Ray(
 							refractionIn.direction,
@@ -88,7 +87,7 @@ public class Ray {
 					
 					Refraction refractionOut = getRefraction(refractionRay.direction, outHit.getNormal().mult(-1), n2, n1);
 					
-					if (refractionOut.direction != null) {
+					if (refractionOut != null) {
 						Ray outRay = new Ray(refractionOut.direction, outHit.getIntersectionPoint().add(refractionOut.direction.mult(OFFSET)), recursionDepth-1);
 
 						result = result.add(outRay.trace(scene).modulate(refractionIn.transmissionAbility));
@@ -119,86 +118,43 @@ public class Ray {
 		float transmissionAbility;
 	}
 	
-	/*private Refraction getRefraction(Vector direction, Vector normal, float n1, float n2) {
-		Refraction refraction = new Refraction();
-		direction = direction.normalize().mult(-1);
-		
-		//float rindex = prim->GetMaterial()->GetRefrIndex();
+	/**
+	 * Ported from paper "Reflections and Refractions in Ray Tracing" by Bram de Greve (2006)
+	 * @param incident
+	 * @param normal
+	 * @param n1
+	 * @param n2
+	 * @return
+	 */
+	private Refraction getRefraction(Vector incident, Vector normal, float n1, float n2) {
 		float n = n1 / n2;
-		float cosI = normal.dot(direction);
-		float cosT2 = 1.0f - n * n * (1.0f - cosI * cosI);
-		if (cosT2 > 0.0f)
-		{
-			refraction.direction = direction.mult(n).add(normal.mult(n * cosI - (float)Math.sqrt( cosT2 )));
-			refraction.reflectionAbility = 0;
-			refraction.transmissionAbility = 1;
+		float cosI = -normal.dot(incident);
+		float sinT2 = n * n * (1.0f - cosI * cosI);
+		
+		if (sinT2 > 1.0) { // TIR
+			return null;
 		}
 		
-		return refraction;
-	}*/
-	
-	private Refraction getRefraction(Vector direction, Vector normal, float n1, float n2) {
+		float cosT = (float)Math.sqrt(1.0f - sinT2);
 		
-		Refraction refraction = new Refraction();
+		Refraction res = new Refraction();
+		res.direction = incident.mult(n).add(normal.mult(n * cosI - cosT));
 		
-		float n = n1 / n2;
+		// Schlick approximation
+		float r0 = (n1 - n2) / (n1 + n2);
+		r0 *= r0;
 		
-		
-		float c1 = -normal.dot(direction.normalize());
-		float thetaT = (float) (Math.pow(n, 2) * (1 - Math.pow(c1, 2)));
-		
-		if (thetaT <= 1) {
-			float c2 = (float) Math.sqrt(1 - thetaT);
-			
-			Vector B = normal.mult(n*c1-c2);
-			Vector D = direction.normalize().mult(n);
-			
-			refraction.direction = D.add(B);
-
-			// schlick approximation
-			float r0 = (float) Math.pow((n2 - 1) / (n2 + 1), 2);
-			refraction.reflectionAbility = (float) (r0 + (1 - r0) * Math.pow((float) (1 - Math.pow(Math.cos(c1), 2)), 5));
-			refraction.transmissionAbility = 1 - refraction.reflectionAbility;
-			
-		} else {
-			refraction.direction = null;
-			refraction.reflectionAbility = 1;
-			refraction.transmissionAbility = 0;
+		float cosX = cosI;
+		if (n1 > n2) {
+			cosX = cosT;
 		}
+		float x = 1.0f - cosX;
 		
-		return refraction;
+		res.reflectionAbility = r0 + (1.0f -r0) * x * x * x * x * x;
+		res.transmissionAbility = 1.0f - res.reflectionAbility;
+		
+		return res;
 	}
-	
-	/*private Refraction getRefraction(Vector direction, Vector normal, float n1, float n2) {
-		
-		Refraction refraction = new Refraction();
-		
-		float refractionIndex = n1 / n2;
-		Vector D = direction.mult(-refractionIndex);
-		
-		float thetaI = normal.dot(direction.mult(-1));
-		float thetaT = (float) (Math.pow(refractionIndex, 2) * (1 - Math.pow(Math.cos(thetaI), 2)));
-		
-		if (thetaT <= 1) {
-			float sqrtPart = (float) (1 - thetaT);
-			
-			if (sqrtPart >= 0) {
-				Vector B = normal.mult((float) (refractionIndex * Math.cos(thetaI) - Math.sqrt(sqrtPart)));
-				refraction.direction = D.add(B).normalize();
-
-				// schlick approximation
-				float r0 = (float) Math.pow((n2 - 1) / (n2 + 1), 2);
-				refraction.reflectionAbility = (float) (r0 + (1 - r0) * Math.pow((float) (1 - Math.pow(Math.cos(thetaI), 2)), 5));
-				refraction.transmissionAbility = 1 - refraction.reflectionAbility;
-			}
-		} else {
-			refraction.direction = null;
-			refraction.reflectionAbility = 1;
-			refraction.transmissionAbility = 0;
-		}
-		
-		return refraction;
-	}*/
 	
 	private Vector getReflection(Vector direction, Vector normal) {
 		Vector rayDirection = direction.normalize().mult(-1);

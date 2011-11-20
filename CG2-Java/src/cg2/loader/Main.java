@@ -17,8 +17,8 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		final int width = 800;
-		final int height = 600;
+		final int width = 1280;
+		final int height = 720;
 		
 		final Vector eyePosition = new Vector(0f, 0f, 0f);
 		final Vector viewingDirection = new Vector(0f, 0f, 0f);
@@ -41,7 +41,7 @@ public class Main {
 		glassSphereBlue.setPhongExponent(26);
 		glassSphereBlue.setRefractionMediumOutside(1.000292f);
 		glassSphereBlue.setRefractionMediumInside(1.55f);
-		glassSphereBlue.setReflectionCo(0.0f);
+		glassSphereBlue.setReflectionCo(0.2f);
 		
 		Material glossySphereBlue = new Material();
 		glossySphereBlue.setAmbientCo(new Color(0, 0, 1));
@@ -73,6 +73,7 @@ public class Main {
 		scene.addShape(new Sphere(glossySphereBlue, new Vector(-1.4f, 0.5f, -5f), 0.1f));
 		scene.addShape(new Sphere(glossySphereGreen, new Vector(3.5f, 0.5f, -10f), 0.1f));
 		scene.addShape(new Sphere(glossySphereRed, new Vector(0.7f, 0.5f, -7f), 0.1f));
+		//scene.addShape(new Sphere(glassSphereBlue, new Vector(0.7f, 0.5f, -7f), 0.1f));
 		scene.addShape(new Sphere(glassSphereBlue, new Vector(0.2f, 0.5f, -3f), 0.1f));
 		
 		// add ambient light to scene
