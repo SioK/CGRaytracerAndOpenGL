@@ -92,11 +92,7 @@ public class Main {
 		String path = System.getProperty("user.home");
 		String filename = path + "/" + "raytraced.png";
 		
-		long start = System.currentTimeMillis();
 		new ImageGenerator(rt, width, height, filename, "png");
-		long end = System.currentTimeMillis();
-		
-		System.out.println("Rendertime: "+(end-start)+"ms");
 		
 		ImageGenerator.showImage(filename);
 	}
