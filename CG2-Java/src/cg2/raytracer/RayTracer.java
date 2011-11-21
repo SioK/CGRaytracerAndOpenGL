@@ -58,8 +58,6 @@ public class RayTracer implements Painter {
 		
 		for (int row = 0; row < height; row++) {
 			for (int col = 0; col < width; col++) {
-				if (col == 888 && row == 330)
-					System.out.println("hi");
 				Ray ray = cam.generateRay(col, row, width, height, RECURSION_DEPTH);
 				result[row][col] = ray.trace(scene);
 			}

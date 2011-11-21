@@ -80,7 +80,7 @@ public class Ray {
 					Vector offset = refractionIn.direction.mult(OFFSET);
 					Ray refractionRay = new Ray(
 							refractionIn.direction,
-							firstHit.getIntersectionPoint().sub(offset),
+							firstHit.getIntersectionPoint().add(offset),
 							recursionDepth);
 					
 					Hit outHit = scene.intersect(refractionRay);

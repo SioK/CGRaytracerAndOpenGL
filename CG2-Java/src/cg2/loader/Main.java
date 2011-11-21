@@ -34,14 +34,14 @@ public class Main {
 		glossySphereRed.setPhongExponent(26);
 		glossySphereRed.setReflectionCo(0.5f);
 		
-		Material glassSphereBlue = new Material();
-		glassSphereBlue.setAmbientCo(new Color(0.1f, 0.1f, 0.5f));
-		glassSphereBlue.setDiffuseCo(new Color(0.1f, 0.1f, 0.5f));
-		glassSphereBlue.setSpecularCo(new Color(0.5f, 0.5f, 0.5f));
-		glassSphereBlue.setPhongExponent(26);
-		glassSphereBlue.setRefractionMediumOutside(1.000292f);
-		glassSphereBlue.setRefractionMediumInside(1.55f);
-		glassSphereBlue.setReflectionCo(0.2f);
+		Material glassSphere = new Material();
+		glassSphere.setAmbientCo(new Color(0.1f, 0.1f, 0.1f));
+		glassSphere.setDiffuseCo(new Color(0.1f, 0.1f, 0.1f));
+		glassSphere.setSpecularCo(new Color(0.7f, 0.7f, 0.7f));
+		glassSphere.setPhongExponent(80);
+		glassSphere.setRefractionMediumOutside(1.000292f);
+		glassSphere.setRefractionMediumInside(1.55f);
+		glassSphere.setReflectionCo(0.2f);
 		
 		Material glossySphereBlue = new Material();
 		glossySphereBlue.setAmbientCo(new Color(0, 0, 1));
@@ -70,11 +70,11 @@ public class Main {
 
 		scene.addShape(new Plane(glossyPlane, new Vector(0, -1, 0), new Vector(0.0f,
 				1f, 0.0f)));
-		scene.addShape(new Sphere(glossySphereBlue, new Vector(-1.4f, 0.5f, -5f), 0.1f));
-		scene.addShape(new Sphere(glossySphereGreen, new Vector(3.5f, 0.5f, -10f), 0.1f));
-		scene.addShape(new Sphere(glossySphereRed, new Vector(0.7f, 0.5f, -7f), 0.1f));
+		scene.addShape(new Sphere(glossySphereBlue, new Vector(-1.4f, 0.5f, -5f), 0.7f));
+		scene.addShape(new Sphere(glossySphereGreen, new Vector(3.5f, 0.5f, -10f), 0.7f));
+		scene.addShape(new Sphere(glossySphereRed, new Vector(0.7f, 0.5f, -7f), 0.7f));
 		//scene.addShape(new Sphere(glassSphereBlue, new Vector(0.7f, 0.5f, -7f), 0.1f));
-		scene.addShape(new Sphere(glassSphereBlue, new Vector(0.2f, 0.5f, -3f), 0.1f));
+		scene.addShape(new Sphere(glassSphere, new Vector(0.2f, 0.5f, -3f), 0.7f));
 		
 		// add ambient light to scene
 		scene.setAmbientLight(new AmbientLight(0.2f,

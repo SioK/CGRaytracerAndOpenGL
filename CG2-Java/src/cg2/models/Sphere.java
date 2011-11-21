@@ -8,13 +8,6 @@ public class Sphere extends Shape {
 	private Vector center;
 	private float radius;
 
-	/**
-	 * 
-	 * @param color
-	 * @param center
-	 * @param radius
-	 * @param material
-	 */
 	public Sphere(Material material, Vector center, float radius) {
 		super(material);
 		this.center = center;
@@ -28,7 +21,7 @@ public class Sphere extends Shape {
 		Vector distance = center.sub(ray.getOrigin());
 		Vector direction = ray.getDirection();
 		double B = direction.dot(distance);
-		double D = (B * B) - (distance.dot(distance)) + Math.pow(2, radius);
+		double D = (B * B) - (distance.dot(distance)) + Math.pow(radius,2);
 
 		t1 = (float) (B - Math.sqrt(D));
 		t2 = (float) (B + Math.sqrt(D));
